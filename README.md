@@ -267,3 +267,37 @@ class BooksController extends ApiGuardController
 The above example will limit the request rate to the `show` method to 1000 requests per day.
 
 Note: The `increment` option can be any value that is accepted by the `strtotime()` method.
+
+##Testing
+In order to test an api-guarded endpoint, you'll need to add the X-Authorization token to the header:
+```php
+<?php
+$response = $this->call('GET', '/api/v1/some-endpoint', [], [], [], ['HTTP_X-Authorization' => 'VALID_TOKEN_HERE']);
+``` 
+Note that you have to prepend the header value with `HTTP_` to make this work.
+
+Here is a helper method to put into your base class (TestCase.php by default) to utilize the token:
+```php
+<?php
+/**
+     * Overrides a normal call() method to inject a valid Auth Token
+     * 
+     * @param  string  $method
+     * @param  string  $uri
+     * @param  array   $parameters
+     * @param  array   $cookies
+     * @param  array   $files
+     * @param  array   $server
+     * @param  string  $content
+     * @return \Illuminate\Http\Response
+     */
+    protected function callWithValidToken($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+    {
+        return $this->call($method, $uri, $parameters, $cookies, $files, array_merge($server, ['HTTP_X-Authorization' => 'VALID_TOKEN_HERE']), $content);
+    }
+```
+Just use this new method instead of `call` to use the token for each request:
+```php
+<?php
+$response = $this->callWithValidToken('GET', '/api/v1/some-endpoint');
+```
