@@ -6,7 +6,5 @@ use Chrisbjr\ApiGuard\Repositories\ApiKeyRepository;
 
 class ApiKey extends ApiKeyRepository
 {
-
     //
-
 }
